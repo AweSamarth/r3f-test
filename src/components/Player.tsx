@@ -6,14 +6,16 @@ import { Vector3 } from "three";
 import { useKeyboard } from "@/hooks/useKeyboard";
 
 const JUMP_FORCE = 4;
-const SPEED = 4;
+const MOVEMENT_SPEED = 4;
+const SPRINT_SPEED = 8;
+
 export const Player = () => {
-  const { moveBackward, moveForward, moveLeft, moveRight, jump } =
+  const { moveBackward, moveForward, moveLeft, moveRight, jump, sprint } =
     useKeyboard();
   const { camera } = useThree();
 
   const [ref, api] = useSphere(() => ({
-    mass: 1,
+    mass: 10,
     type: "Dynamic",
     position: [0, 1, 0],
   }));
@@ -29,27 +31,28 @@ export const Player = () => {
   }, [api.position]);
 
   useFrame(() => {
+    const facingDirection = new Vector3();
+    camera.getWorldDirection(facingDirection);
+
     camera.position.copy(
       new Vector3(pos.current[0], pos.current[1], pos.current[2])
     );
 
-    const direction = new Vector3();
-    const frontVector = new Vector3(
-      0,
+    let movementSpeed = MOVEMENT_SPEED;
+    if (sprint && moveForward) {
+      movementSpeed = SPRINT_SPEED;
+    }
+
+    const direction = new Vector3(
+      (moveRight ? 1 : 0) - (moveLeft ? 1 : 0),
       0,
       (moveBackward ? 1 : 0) - (moveForward ? 1 : 0)
-    );
-    const sideVector = new Vector3(
-    (moveRight ? 1 : 0) - (moveLeft ? 1 : 0),
-      0,
-      0
-    );
-
-    direction
-      .addVectors(frontVector, sideVector)
+    )
       .normalize()
-      .multiplyScalar(SPEED)
+      .multiplyScalar(movementSpeed)
       .applyEuler(camera.rotation);
+
+
 
     api.velocity.set(direction.x, vel.current[1], direction.z);
 

@@ -16,7 +16,8 @@ function actionByKey(key) {
     Digit3: "glass",
     Digit4: "wood",
     Digit5: "log",
-    Escape: "escape",
+    ShiftLeft:"sprint"
+    
 
   };
 
@@ -30,6 +31,7 @@ export const useKeyboard = () => {
     moveLeft: false,
     moveRight: false,
     jump: false,
+    sprint:false,
     dirt: false,
     glass: false,
     grass: false,
